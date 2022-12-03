@@ -4,6 +4,7 @@ import personService from './services/persons'
 import Filter from './components/filter'
 import PersonForm from './components/personform'
 import Persons from './components/persons'
+import Notification from './components/notification'
 import './index.css'
 
 
