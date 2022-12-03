@@ -34,8 +34,8 @@ const App = () => {
     if (window.confirm(`Delete ${deletePerson.name}`)) {
       remove(id)
       setPersons(persons.filter(person => person.id !== id))
-      setNotification(`Removed ${deletePerson.name}`)
       handleNotification()
+      setNotification(`Removed ${deletePerson.name}`)
     }
   }
 
@@ -62,18 +62,18 @@ const App = () => {
        update(findName.id, newPerson)
        .then(returnedPerson => {
         setPersons(persons.map(person => person.id === findName.id ? returnedPerson : person))
+        handleNotification()
         setNotification(`Updated ${returnedPerson.name}`)
-        handleNotification()
       }).catch(() => {
-        setNotification(`Information of ${newPerson.name} has already been removed from the server `)
         handleNotification()
+        setNotification(`Information of ${newPerson.name} has already been removed from the server `)
       }) 
        : null
     }
 
     create(newPerson).then(returnedPerson => setPersons([...persons, returnedPerson]))
-    setNotification(`Added ${newPerson.name}`)
     handleNotification()
+    setNotification(`Added ${newPerson.name}`)
   }
 
   return (
