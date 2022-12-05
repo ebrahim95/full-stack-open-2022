@@ -45,19 +45,22 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', (request, response) => { 
-    response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`)
+    Person.find().then(persons => {
+        return response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`)
+    })
 }) 
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = +request.params.id
-    const person = persons.find(person => person.id === id)
-
-    if (!person) {
-        response.statusMessage = "the note does not exist"
-        return response.status(404).end()
-    }
-
-    response.json(person)
+    const id = request.params.id
+    Person.findById(id)
+    .then(person => {
+        if (person) {
+            response.json(person)
+        } else {
+            response.statusMessage = "the note does not exist"
+            response.status(404).end()
+        }
+    })
 })
 
 app.post('/api/persons/', (request, response) => {
@@ -89,13 +92,39 @@ app.post('/api/persons/', (request, response) => {
     newPerson.save().then(returnedPerson => response.json(returnedPerson))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = +request.params.id
-    persons = persons.filter(person => person.id !== id)
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+    Person.findByIdAndRemove(id)
+    .then(() => response.status(204).end())
+    .catch(error => next(error))
+
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+    const updatePerson = {
+        name: request.body.name,
+        number: request.body.number
+    }
+
+    Person.findByIdAndUpdate(id, updatePerson, {new: true})
+    .then(returnedPerson => response.json(returnedPerson))
+    .catch(error => next(error))
 })
 
 const PORT = process.env.PORT 
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`)
 })
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(404).send({ error: 'Malformatted ID'})
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)

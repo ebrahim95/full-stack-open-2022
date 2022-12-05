@@ -52,7 +52,6 @@ const App = () => {
     const newPerson = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
     }
 
     const findName = persons.find(person => person.name.toLowerCase() === newName.toLowerCase()) 
