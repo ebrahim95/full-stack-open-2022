@@ -1,8 +1,12 @@
 const Notification = ({message}) => {
     if (message === null) return null 
-    const errOrSucc = message.toLowerCase().includes("removed") ? "error" : "success"
+    
+    const messageErrOrSucc = message.toLowerCase().includes("failed") 
+    || message.toLowerCase().includes("removed")
+
+    const messageColor = messageErrOrSucc ? "error" : "success"
     return (
-      <div className={errOrSucc}>
+      <div className={messageColor}>
         {message}
       </div>
     )

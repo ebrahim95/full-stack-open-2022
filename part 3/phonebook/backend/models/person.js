@@ -9,8 +9,21 @@ mongoose.connect(url)
 .catch(error => console.log("error connecting to MongoDB", error.message))
 
 const phoneSchema = new mongoose.Schema({
-    name: String, 
-    number: String, 
+    name:{
+        type: String,
+        minLength: 3,
+        required: true
+    }, 
+    number: {
+        type: String,
+        validate: {
+            validator: function (v) {
+                return /\d{3}-\d{5}/.test(v) || /\d{2}-\d{6}/.test(v)
+            },
+            message: props => `${props.value} is not a valid phone number!`
+        },
+        required: true
+    }, 
 })
 
 phoneSchema.set('toJSON', {

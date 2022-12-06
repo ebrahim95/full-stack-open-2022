@@ -25,7 +25,10 @@ const App = () => {
     }, [getAll])
 
 
-  const handleNotification = () => {setTimeout( () => setNotification(null), 5000)}
+  const handleNotification = (message) => {
+    setNotification(message)
+    setTimeout( () => setNotification(null), 5000)
+  }
   const handleNameChange = event => setNewName(event.target.value)
   const handleNewNumber = event => setNewNumber(event.target.value)
   const handleSearch = event => setSearch(event.target.value)
@@ -34,8 +37,7 @@ const App = () => {
     if (window.confirm(`Delete ${deletePerson.name}`)) {
       remove(id)
       setPersons(persons.filter(person => person.id !== id))
-      handleNotification()
-      setNotification(`Removed ${deletePerson.name}`)
+      handleNotification(`Removed ${deletePerson.name}`)
     }
   }
 
@@ -61,18 +63,21 @@ const App = () => {
        update(findName.id, newPerson)
        .then(returnedPerson => {
         setPersons(persons.map(person => person.id === findName.id ? returnedPerson : person))
-        handleNotification()
-        setNotification(`Updated ${returnedPerson.name}`)
-      }).catch(() => {
-        handleNotification()
-        setNotification(`Information of ${newPerson.name} has already been removed from the server `)
+        handleNotification(`Updated ${returnedPerson.name}`)
+      }).catch((error) => {
+        handleNotification(` ${error.response.data.error}`)
       }) 
        : null
+    } else {
+      create(newPerson)
+      .then(returnedPerson => {
+        setPersons([...persons, returnedPerson])
+        handleNotification(`Added ${newPerson.name}`)
+      })
+      .catch(error => {
+        handleNotification(error.response.data.error)
+      })
     }
-
-    create(newPerson).then(returnedPerson => setPersons([...persons, returnedPerson]))
-    handleNotification()
-    setNotification(`Added ${newPerson.name}`)
   }
 
   return (

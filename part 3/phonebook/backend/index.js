@@ -63,7 +63,7 @@ app.get('/api/persons/:id', (request, response) => {
     })
 })
 
-app.post('/api/persons/', (request, response) => {
+app.post('/api/persons/', (request, response, next) => {
     const person = request.body
     person.name = person.name === "" ? null : person.name
     person.number = person.number === "" ? null : person.number
@@ -89,7 +89,12 @@ app.post('/api/persons/', (request, response) => {
         name: person.name,
         number: person.number
     })
-    newPerson.save().then(returnedPerson => response.json(returnedPerson))
+    newPerson
+    .save()
+    .then(returnedPerson => response.json(returnedPerson))
+    .catch( error => {
+        next(error)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -107,9 +112,11 @@ app.put('/api/persons/:id', (request, response, next) => {
         number: request.body.number
     }
 
-    Person.findByIdAndUpdate(id, updatePerson, {new: true})
+    Person.findByIdAndUpdate(id, updatePerson, {new: true, runValidators: true, context: 'query'})
     .then(returnedPerson => response.json(returnedPerson))
-    .catch(error => next(error))
+    .catch(error => {
+        next(error)
+    })
 })
 
 const PORT = process.env.PORT 
@@ -122,6 +129,10 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(404).send({ error: 'Malformatted ID'})
+    }
+
+    if (error.name === "ValidationError") {
+        return response.status(404).json({ error: error.message})
     }
 
     next(error)
