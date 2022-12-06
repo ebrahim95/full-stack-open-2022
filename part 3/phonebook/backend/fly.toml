@@ -1,6 +1,6 @@
-# fly.toml file generated for lingering-wave-221 on 2022-12-02T19:01:00-06:00
+# fly.toml file generated for small-hill-6640 on 2022-12-06T00:23:02-06:00
 
-app = "lingering-wave-221"
+app = "small-hill-6640"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []

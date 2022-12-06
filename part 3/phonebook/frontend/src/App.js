@@ -56,18 +56,7 @@ const App = () => {
     }
 
     const findName = persons.find(person => person.name.toLowerCase() === newName.toLowerCase()) 
-    if (findName) {
-      const confirmUpdate = window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one`)
-       return confirmUpdate ? 
-       update(findName.id, newPerson)
-       .then(returnedPerson => {
-        setPersons(persons.map(person => person.id === findName.id ? returnedPerson : person))
-        handleNotification(`Updated ${returnedPerson.name}`)
-      }).catch((error) => {
-         handleNotification(error.response.data.error)
-      }) 
-       : null
-    } else {
+    if (!findName) {
       create(newPerson)
       .then(returnedPerson => {
         setPersons([...persons, returnedPerson])
@@ -76,7 +65,18 @@ const App = () => {
       .catch(error => {
         handleNotification(error.response.data.error)
       })
-    }
+    } 
+    
+    if (window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one`))
+    {
+       update(findName.id, newPerson)
+       .then(returnedPerson => {
+        setPersons(persons.map(person => person.id === findName.id ? returnedPerson : person))
+        handleNotification(`Updated ${returnedPerson.name}`)
+      }).catch((error) => {
+         handleNotification(error.response.data.error)
+      }) 
+    } 
   }
 
   return (
