@@ -113,7 +113,13 @@ app.put('/api/persons/:id', (request, response, next) => {
     }
 
     Person.findByIdAndUpdate(id, updatePerson, {new: true, runValidators: true, context: 'query'})
-    .then(returnedPerson => response.json(returnedPerson))
+    .then(returnedPerson => {
+        if (returnedPerson) {
+            response.json(returnedPerson)
+        } else {
+            response.status(404).json({error: `Information of ${updatePerson.name} has already been removed from the server`})
+        }
+    })
     .catch(error => {
         next(error)
     })

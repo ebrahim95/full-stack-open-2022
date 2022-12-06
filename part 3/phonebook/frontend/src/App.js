@@ -41,7 +41,7 @@ const App = () => {
     }
   }
 
-
+  console.log(persons)
   const filteredNames = persons.filter(person =>  {
     return person.name.toLowerCase().includes(search.toLowerCase())
   })
@@ -65,7 +65,7 @@ const App = () => {
         setPersons(persons.map(person => person.id === findName.id ? returnedPerson : person))
         handleNotification(`Updated ${returnedPerson.name}`)
       }).catch((error) => {
-        handleNotification(error.response.data.error)
+         handleNotification(error.response.data.error)
       }) 
        : null
     } else {
