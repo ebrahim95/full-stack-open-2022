@@ -41,7 +41,6 @@ const App = () => {
     }
   }
 
-  console.log(persons)
   const filteredNames = persons.filter(person =>  {
     return person.name.toLowerCase().includes(search.toLowerCase())
   })
