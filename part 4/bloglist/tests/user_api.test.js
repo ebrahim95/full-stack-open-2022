@@ -6,7 +6,7 @@ const { usersInDB } = require('./user_api_helper')
 const api = supertest(app)
 
 
-describe('addition of a new blog', () => {
+describe('addition of a new user', () => {
   test('return statuscode 400 if the password is not of min length', async () => {
 
     const usersAtStart = await usersInDB()

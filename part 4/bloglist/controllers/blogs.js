@@ -1,15 +1,20 @@
 const blogsRouter = require('express').Router()
 const JsonWebToken  = require('jsonwebtoken')
+const { response } = require('../app')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const { userExtractor } = require('../utils/middleware')
+const { SECRET }= require('../utils/config')
 
-
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7)
+const findUserByToken = async (token) => {
+  const decodedToken = JsonWebToken.verify(token, SECRET)
+  if (!decodedToken) {
+    return response.status(401).send({
+      error: 'token missing or invalid'
+    })
   }
-  return null
+  const user = await User.findById(decodedToken.id)
+  return user
 }
 
 blogsRouter.get('/', async (request, response) => {
@@ -17,19 +22,9 @@ blogsRouter.get('/', async (request, response) => {
   response.status(201).json(blogs)
 })
 
-blogsRouter.post('/', async (request, response, next) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
   let { title, author, url, likes } = request.body
-  const token = getTokenFrom(request)
-  // eslint-disable-next-line no-undef
-  const decodedToken = JsonWebToken.verify(token, process.env.SECRET)
-
-  if (!decodedToken.id) {
-    response.status(401).json({
-      error: 'token missing or invalid'
-    })
-  }
-
-  const user = await User.findById(decodedToken.id)
+  const user =  request.user
 
   if (!likes) {
     likes = 0
@@ -39,8 +34,6 @@ blogsRouter.post('/', async (request, response, next) => {
     response.status(400).end()
   }
 
-  console.log(user)
-
   const blog = new Blog({
     title,
     author,
@@ -49,30 +42,25 @@ blogsRouter.post('/', async (request, response, next) => {
     user: user._id
   })
 
-  try {
-
-    const savedBlog = await blog.save()
-    user.blogs = [...user.blogs, savedBlog._id]
-    await user.save()
-    response.status(201).json(savedBlog)
-
-  } catch (expection) {
-    next(expection)
-  }
-
+  const savedBlog = await blog.save()
+  user.blogs = [...user.blogs, savedBlog._id]
+  await user.save()
+  response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete('/:id', async (request, response, next) => {
+blogsRouter.delete('/:id', async (request, response) => {
   const id = request.params.id
-
-  try {
-
+  const user = await findUserByToken(request.token)
+  const blogUser = await Blog.findById(id)
+  if ((user.id.toString() === blogUser.user.toString())) {
     await Blog.findByIdAndRemove(id)
-    response.status(204).end()
-
-  } catch (expection) {
-    next(expection)
+    return response.status(204).end()
   }
+
+  response.status(401).json({
+    error: 'wrong user'
+  })
+
 })
 
 blogsRouter.put('/:id', async (request, response, next) => {

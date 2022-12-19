@@ -2,15 +2,18 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 const { initialBlogs, blogsInDB } = require('./blog_api_helper')
 const api = supertest(app)
-
+const JsonWebToken = require('jsonwebtoken')
+const { SECRET }= require('../utils/config')
 
 beforeEach( async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(initialBlogs)
-
 })
+
 
 describe('when there is initially some blogs saved', () => {
 
@@ -19,7 +22,7 @@ describe('when there is initially some blogs saved', () => {
       .get('/api/blogs')
       .expect(201)
       .expect('Content-Type', /application\/json/)
-  }, 100000)
+  }, 10000)
 
 
   test('check if blog id is defined', async () => {
@@ -32,18 +35,33 @@ describe('when there is initially some blogs saved', () => {
 
 
 describe('addition of a new blog', () => {
+  let token = null
+  beforeEach(async () => {
+    await User.deleteMany({})
 
-  test('succeeds wtih valid data', async () => {
+    const passwordHash = await bcrypt.hash('qwerty', 10)
+    const user = new User({ username: 'root', name: 'super', passwordHash })
+
+    const returnedUser = await user.save()
+
+    token = JsonWebToken.sign({ username: returnedUser.username, id: returnedUser._id }, SECRET)
+
+
+
+  })
+  test('succeeds with valid data', async () => {
+
     const newBlog = {
       title: 'Sample Blog',
       author: 'Ebrahim A. Haji',
       url: 'http://google.com',
-      likes: 5,
+      likes: 5
     }
 
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -54,6 +72,7 @@ describe('addition of a new blog', () => {
   })
 
   test('return statuscode 201 if likes property is undefined and set to default value of 0', async () => {
+
     const newBlog = {
       title: 'Sample Blog',
       author: 'Ebrahim A. Haji',
@@ -64,6 +83,7 @@ describe('addition of a new blog', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -73,6 +93,7 @@ describe('addition of a new blog', () => {
   })
 
   test('return statuscode 400 if the url or title property is missing', async () => {
+
     const newBlogNoTitle = {
       url: 'http://google.com',
       author: 'Ebrahim A. Haji'
@@ -85,13 +106,31 @@ describe('addition of a new blog', () => {
     await api
       .post('/api/blogs')
       .send(newBlogNoTitle)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
 
     await api
       .post('/api/blogs')
       .send(newBlogNoUrl)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
 
+  })
+
+  test('return statuscode 401 if token is not provided', async () => {
+
+    const newBlog = {
+      title: 'Sample Blog',
+      author: 'Ebrahim A. Haji',
+      url: 'http://google.com',
+      likes: 5
+    }
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${null}`)
+      .send(newBlog)
+      .expect(401)
   })
 })
 
@@ -116,22 +155,65 @@ describe('updating a blog', () => {
 })
 
 describe('deletion of a blog', () => {
-  test('return statusCode 204 if deletion successful', async () => {
-    const blogAtStart = await blogsInDB()
-    const deleteBlog = blogAtStart[0]
+  let token = null
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('qwerty', 10)
+    const user = new User({ username: 'root', name: 'super', passwordHash })
+
+    const returnedUser = await user.save()
+
+    token = JsonWebToken.sign({ username: returnedUser.username, id: returnedUser._id }, SECRET)
+  })
+
+  test('return statuscode 204 if deletion successful', async () => {
+    const newBlog = {
+      title: 'Sample Blog',
+      author: 'Ebrahim A. Haji',
+      url: 'http://google.com',
+      likes: 5
+    }
+    const deleteBlog = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
     await api
-      .delete(`/api/blogs/${deleteBlog.id}`)
+      .delete(`/api/blogs/${deleteBlog.body.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const blogsAtEnd = await blogsInDB()
 
-    expect(blogsAtEnd).toHaveLength(initialBlogs.length - 1)
-
     const titles = blogsAtEnd.map(blog => blog.title)
+
     expect(titles).not.toContain(deleteBlog.title)
 
   })
+
+  test('return statuscode 401 if token is missing or invalid', async () => {
+    const newBlog = {
+      title: 'Sample Blog',
+      author: 'Ebrahim A. Haji',
+      url: 'http://google.com',
+      likes: 5
+    }
+    const deleteBlog = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    await api
+      .delete(`/api/blogs/${deleteBlog.body.id}`)
+      .set('Authorization', `Bearer ${'f'}`)
+      .expect(401)
+  })
+
 })
 
 
