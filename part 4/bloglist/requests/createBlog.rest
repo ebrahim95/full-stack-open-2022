@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVicmFoaW05NSIsImlkIjoiNjM5Y2Q0YTgzYzkyMjcyZjQ1ZDNhM2QxIiwiaWF0IjoxNjcxMzQyODY1fQ.428vvPLFpBPYui6tSb3dXjDAjG4Mkeqj_ojU0glkKYg
+Authorization: bearer 
 
 {
   "title": "run like joe",
