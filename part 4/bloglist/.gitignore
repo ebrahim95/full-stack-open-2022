@@ -5,7 +5,7 @@
 
 # testing
 /coverage
-
+/requests
 
 # misc
 .DS_Store
