@@ -1,6 +1,5 @@
 const blogsRouter = require('express').Router()
 const JsonWebToken  = require('jsonwebtoken')
-const { response } = require('../app')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const { userExtractor } = require('../utils/middleware')
@@ -8,11 +7,6 @@ const { SECRET }= require('../utils/config')
 
 const findUserByToken = async (token) => {
   const decodedToken = JsonWebToken.verify(token, SECRET)
-  if (!decodedToken) {
-    return response.status(401).send({
-      error: 'token missing or invalid'
-    })
-  }
   const user = await User.findById(decodedToken.id)
   return user
 }
@@ -55,11 +49,12 @@ blogsRouter.delete('/:id', async (request, response) => {
   if ((user.id.toString() === blogUser.user.toString())) {
     await Blog.findByIdAndRemove(id)
     return response.status(204).end()
+  } else {
+    response.status(401).json({
+      error: 'wrong user'
+    })
   }
 
-  response.status(401).json({
-    error: 'wrong user'
-  })
 
 })
 

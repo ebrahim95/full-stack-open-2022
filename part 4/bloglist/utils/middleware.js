@@ -23,7 +23,6 @@ const getTokenFrom = (request, response, next) => {
 const userExtractor = async (request, response, next) => {
   const token = request.token
   if (token) {
-    // eslint-disable-next-line no-undef
     const decodedToken = JsonWebToken.verify(token, SECRET)
     const user = await User.findById(decodedToken.id)
     request.user = user

@@ -210,8 +210,9 @@ describe('deletion of a blog', () => {
 
     await api
       .delete(`/api/blogs/${deleteBlog.body.id}`)
-      .set('Authorization', `Bearer ${'f'}`)
+      .set('Authorization', `Bearer ${null}`)
       .expect(401)
+
   })
 
 })
