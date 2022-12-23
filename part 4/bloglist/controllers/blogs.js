@@ -19,7 +19,6 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', userExtractor, async (request, response) => {
   let { title, author, url, likes } = request.body
   const user =  request.user
-
   if (!likes) {
     likes = 0
   }

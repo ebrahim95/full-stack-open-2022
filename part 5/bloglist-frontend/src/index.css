@@ -1,0 +1,18 @@
+.red {
+    border:5px solid red;
+    background-color: lightcoral;
+    color: darkred;
+    font-size: 20px;
+    padding: 10px;
+    margin: 5px;
+}
+
+.green {
+    border:5px solid green;
+    background-color: lightgreen;
+    color: darkgreen;
+    padding: 10px;
+    margin: 5px;
+    font-size: 20px;
+
+}
