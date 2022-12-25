@@ -29,8 +29,6 @@ const App = () => {
       const user = JSON.parse(loggedIn)
       setUser(user)
       setToken(user.token)
-      handleNotification(`Welcome Back ${user.name}`)
-
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -79,7 +77,8 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = async () => {
+  const addBlog = async (event) => {
+    event.preventDefault()
     try{
       let returnedBlog = await 
       create({ 
@@ -104,7 +103,7 @@ const App = () => {
     )
   }
   const addForm = () => (
-    <div>
+    <>
       <form onSubmit={addBlog}>
         title{"    "}
         <input type='text' value={title} name='title' onChange={({target}) => setTitle(target.value)}/><br/>
@@ -114,7 +113,7 @@ const App = () => {
         <input type='text' value={url} name='url' onChange={({target}) => setUrl(target.value)}/><br/><br/>
         <button type="submit">Add Blog</button>
       </form>
-    </div>
+    </>
   )
 
 
@@ -130,9 +129,7 @@ const App = () => {
         <Blog key={blog.id} blog={blog} />
       )}
       <h2>create new</h2>
-      <p>
       {addForm()}
-      </p>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 .red {
     border:5px solid red;
-    background-color: lightcoral;
-    color: darkred;
+    background-color: rgb(238, 169, 169);
+    color: black;
     font-size: 20px;
     padding: 10px;
     margin: 5px;
@@ -9,8 +9,8 @@
 
 .green {
     border:5px solid green;
-    background-color: lightgreen;
-    color: darkgreen;
+    background-color: rgb(184, 247, 184);
+    color: black;
     padding: 10px;
     margin: 5px;
     font-size: 20px;
