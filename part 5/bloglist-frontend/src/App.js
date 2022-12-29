@@ -6,6 +6,7 @@ import Notification from './components/Notification'
 import './index.css'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser ] = useState(null)
@@ -13,7 +14,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const { login } = loginService
-  const { setToken, create, getAll, update } = blogService
+  const { setToken, create, getAll, update, remove } = blogService
 
   useEffect(() => {
     getAll().then(blogs =>
@@ -63,7 +64,7 @@ const App = () => {
       
       blogFormRef.current.toggleVisibility()
       setBlogs([...blogs, returnedBlog])
-      handleNotification(`a new Blog ${returnedBlog.title} by ${returnedBlog.author}`)
+      handleNotification(`Successfully a new Blog ${returnedBlog.title} by ${returnedBlog.author}`)
     } catch(error) {
       handleNotification('Wrong Object')
     }
@@ -73,7 +74,18 @@ const App = () => {
       let updatedBlog = await update(id, blogObject)
       const updatedBlogList = blogs.map((blog) => blog.id !== updatedBlog.id ? blog : updatedBlog)
       setBlogs(updatedBlogList)
-      handleNotification(`Blog ${updatedBlog.title} by ${updatedBlog.author} liked`)
+      handleNotification(`Successfully liked ${updatedBlog.title}`)
+    } catch (error) {
+      handleNotification(error.message)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      await remove(id)
+      const updatedBlogList = blogs.filter((blog) => blog.id !== id )
+      setBlogs(updatedBlogList)
+      setNotification(`Successfully Deleted`)
     } catch (error) {
       handleNotification(error.message)
     }
@@ -120,7 +132,7 @@ const App = () => {
         <button onClick={logOut}>logout</button>
       </p>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} handleLikes={handleLikes}/>
+        <Blog key={blog.id} blog={blog} handleLikes={handleLikes} handleDelete={handleDelete} user={user}/>
       )}
       <h2>create new</h2>
       <Togglable buttonLabel='Add Blog' ref={blogFormRef}>

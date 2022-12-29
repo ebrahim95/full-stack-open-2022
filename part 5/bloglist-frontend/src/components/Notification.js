@@ -3,7 +3,7 @@ const Notification = ({message}) => {
         return null
     }
     const LowerCaseMessage = message.toLowerCase()
-    const classChoice = LowerCaseMessage.includes('wrong') ? 'red' : 'green'
+    const classChoice = LowerCaseMessage.includes('successfully') ? 'green' : 'red'
     return (
         <div className={classChoice}>
            {message}
