@@ -1,20 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService  from './services/login'
 import Notification from './components/Notification'
 import './index.css'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser ] = useState(null)
   const [notification, setNotification] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const { login } = loginService
-  const { setToken, create, getAll } = blogService
+  const { setToken, create, getAll, update } = blogService
 
   useEffect(() => {
     getAll().then(blogs =>
@@ -56,6 +55,30 @@ const App = () => {
 
   }
 
+  const blogFormRef = useRef()
+  const addBlog = async (blogObject) => {
+    try{
+      let returnedBlog = await 
+      create(blogObject)
+      
+      blogFormRef.current.toggleVisibility()
+      setBlogs([...blogs, returnedBlog])
+      handleNotification(`a new Blog ${returnedBlog.title} by ${returnedBlog.author}`)
+    } catch(error) {
+      handleNotification('Wrong Object')
+    }
+  }
+  const handleLikes = async (id, blogObject) => {
+    try {
+      let updatedBlog = await update(id, blogObject)
+      const updatedBlogList = blogs.map((blog) => blog.id !== updatedBlog.id ? blog : updatedBlog)
+      setBlogs(updatedBlogList)
+      handleNotification(`Blog ${updatedBlog.title} by ${updatedBlog.author} liked`)
+    } catch (error) {
+      handleNotification(error.message)
+    }
+  }
+
   const loginForm = () => (
     <>
       <h2>Log into Application</h2>
@@ -77,22 +100,7 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-    try{
-      let returnedBlog = await 
-      create({ 
-        title: title,
-        author: author,
-        url: url,
-      })
 
-      setBlogs([...blogs, returnedBlog])
-      handleNotification(`a new Blog ${title} by ${author}`)
-    } catch(error) {
-      handleNotification('Wrong Object')
-    }
-  }
 
   if ( user === null ) {
     return (
@@ -102,20 +110,6 @@ const App = () => {
       </div>
     )
   }
-  const addForm = () => (
-    <>
-      <form onSubmit={addBlog}>
-        title{"    "}
-        <input type='text' value={title} name='title' onChange={({target}) => setTitle(target.value)}/><br/>
-        author{"    "}
-        <input type='text' value={author} name='author' onChange={({target}) => setAuthor(target.value)}/><br/>
-        url{"    "}
-        <input type='text' value={url} name='url' onChange={({target}) => setUrl(target.value)}/><br/><br/>
-        <button type="submit">Add Blog</button>
-      </form>
-    </>
-  )
-
 
   return (
     <div>
@@ -126,10 +120,12 @@ const App = () => {
         <button onClick={logOut}>logout</button>
       </p>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleLikes={handleLikes}/>
       )}
       <h2>create new</h2>
-      {addForm()}
+      <Togglable buttonLabel='Add Blog' ref={blogFormRef}>
+        <BlogForm handleForm={addBlog}/>
+      </Togglable>
     </div>
   )
 }
