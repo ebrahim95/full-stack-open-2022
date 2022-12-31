@@ -6,7 +6,7 @@ import Notification from './components/Notification'
 import './index.css'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
-
+import LoginForm from './components/LoginForm'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser ] = useState(null)
@@ -19,8 +19,7 @@ const App = () => {
   useEffect(() => {
     getAll().then(blogs =>
       setBlogs( blogs )
-    )  
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    )
   }, [])
 
   useEffect(() => {
@@ -30,7 +29,6 @@ const App = () => {
       setUser(user)
       setToken(user.token)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleNotification = (message) => {
@@ -41,14 +39,14 @@ const App = () => {
     event.preventDefault()
 
     try {
-      const user = await login({username, password}) 
+      const user = await login({ username, password })
       window.localStorage.setItem('loggedIn', JSON.stringify(user))
       setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
       handleNotification(`Successfully logged in ${user.name}`)
-      
+
     } catch(exception) {
       setNotification('Wrong Credentials')
       setTimeout(() => { setNotification(null) }, 5000)
@@ -59,9 +57,9 @@ const App = () => {
   const blogFormRef = useRef()
   const addBlog = async (blogObject) => {
     try{
-      let returnedBlog = await 
+      let returnedBlog = await
       create(blogObject)
-      
+
       blogFormRef.current.toggleVisibility()
       setBlogs([...blogs, returnedBlog])
       handleNotification(`Successfully a new Blog ${returnedBlog.title} by ${returnedBlog.author}`)
@@ -85,29 +83,15 @@ const App = () => {
       await remove(id)
       const updatedBlogList = blogs.filter((blog) => blog.id !== id )
       setBlogs(updatedBlogList)
-      setNotification(`Successfully Deleted`)
+      setNotification('Successfully Deleted')
     } catch (error) {
       handleNotification(error.message)
     }
   }
 
-  const loginForm = () => (
-    <>
-      <h2>Log into Application</h2>
-      <form onSubmit={handleLogin}>
-        <div>username 
-          <input type='text' value={username} name='Username' onChange={({target}) => setUsername(target.value)}/>
-        </div> 
-        <div>
-          password 
-          <input type='password' value={password} name='Password' onChange={({target}) => setPassword(target.value)}/>
-        </div>
-        <button type='submit'>login</button>
-      </form>
-    </>
-  )
 
-  const logOut = () => { 
+
+  const logOut = () => {
     window.localStorage.removeItem('loggedIn')
     setUser(null)
   }
@@ -117,8 +101,13 @@ const App = () => {
   if ( user === null ) {
     return (
       <div>
-       { loginForm()}
-       <Notification message={notification} />
+        <LoginForm
+          handleLogin={handleLogin}
+          username={username}
+          password={password}
+          handleUsername={({ target }) => setUsername(target.value)}
+          handlePassword={({ target }) => setPassword(target.value)} />
+        <Notification message={notification} />
       </div>
     )
   }
@@ -131,7 +120,7 @@ const App = () => {
         {`${user.name} is logged in `}
         <button onClick={logOut}>logout</button>
       </p>
-      {blogs.map(blog =>
+      {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
         <Blog key={blog.id} blog={blog} handleLikes={handleLikes} handleDelete={handleDelete} user={user}/>
       )}
       <h2>create new</h2>
