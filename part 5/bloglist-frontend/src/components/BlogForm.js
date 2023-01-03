@@ -21,11 +21,17 @@ const BlogForm = ({  handleForm }) => {
     <div>
       <form onSubmit={blogToBe}>
                 title{'    '}
-        <input type='text' value={title} name='title' onChange={(event) => setTitle(event.target.value)}/><br/>
+        <input className='title' type='text' value={title} name='title'
+          onChange={(event) => setTitle(event.target.value)}
+        /><br/>
                 author{'    '}
-        <input type='text' value={author} name='author' onChange={(event) => setAuthor(event.target.value)}/><br/>
+        <input className='author' type='text' value={author} name='author'
+          onChange={(event) => setAuthor(event.target.value)}
+        /><br/>
                 url{'    '}
-        <input type='text' value={url} name='url' onChange={(event) => setUrl(event.target.value)}/><br/><br/>
+        <input className='url' type='text' value={url} name='url'
+          onChange={(event) => setUrl(event.target.value)}
+        /><br/><br/>
         <button type="submit">Submit Blog</button>
       </form>
     </div>
