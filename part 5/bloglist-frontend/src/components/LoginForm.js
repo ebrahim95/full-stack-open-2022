@@ -5,11 +5,11 @@ const LoginForm = ({ handleLogin, username, password, handleUsername, handlePass
     <h2>Log into Application</h2>
     <form onSubmit={handleLogin}>
       <div>username
-        <input type='text' value={username} name='Username' onChange={handleUsername}/>
+        <input id='username' type='text' value={username} name='Username' onChange={handleUsername}/>
       </div>
       <div>
           password
-        <input type='password' value={password} name='Password' onChange={handlePassword}/>
+        <input id='password' type='password' value={password} name='Password' onChange={handlePassword}/>
       </div>
       <button type='submit'>login</button>
     </form>

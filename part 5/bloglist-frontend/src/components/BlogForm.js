@@ -32,7 +32,7 @@ const BlogForm = ({  handleForm }) => {
         <input className='url' type='text' value={url} name='url'
           onChange={(event) => setUrl(event.target.value)}
         /><br/><br/>
-        <button type="submit">Submit Blog</button>
+        <button id='blogSubmit' type="submit">Submit Blog</button>
       </form>
     </div>
   )
