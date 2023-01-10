@@ -47,7 +47,25 @@ describe('Blog app', function () {
       cy.get('.author').type('Superman')
       cy.get('.url').type('google.com')
       cy.get('#blogSubmit').click()
+
       cy.get('.green').should('contain', 'Successfully')
+      cy.get('.defaultDetails').should('contain', 'Sample Blog')
+    })
+
+    describe('and a blog exist', function () {
+      beforeEach(function () {
+        cy.contains('Add Blog').click()
+        cy.get('.title').type('Batman')
+        cy.get('.author').type('Bane')
+        cy.get('.url').type('google.com')
+        cy.get('#blogSubmit').click()
+      })
+
+      it('user can like a blog', function () {
+        cy.contains('View').click()
+        cy.get('.handleLikes').should('contain', 'Like').click()
+        cy.get('#viewDetails').should('contain', 'likes: 1')
+      })
     })
   })
 })
