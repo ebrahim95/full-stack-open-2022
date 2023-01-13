@@ -83,7 +83,7 @@ const App = () => {
       await remove(id)
       const updatedBlogList = blogs.filter((blog) => blog.id !== id )
       setBlogs(updatedBlogList)
-      setNotification('Successfully Deleted')
+      handleNotification('Successfully Deleted')
     } catch (error) {
       handleNotification(error.message)
     }
@@ -120,9 +120,11 @@ const App = () => {
         {`${user.name} is logged in `}
         <button onClick={logOut}>logout</button>
       </p>
-      {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-        <Blog key={blog.id} blog={blog} handleLikes={handleLikes} handleDelete={handleDelete} user={user}/>
-      )}
+      <div className='blogs'>
+        {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+          <Blog key={blog.id} blog={blog} handleLikes={handleLikes} handleDelete={handleDelete} user={user}/>
+        )}
+      </div>
       <h2>create new</h2>
       <Togglable buttonLabel='Add Blog' ref={blogFormRef}>
         <BlogForm handleForm={addBlog}/>

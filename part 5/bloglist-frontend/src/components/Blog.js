@@ -32,9 +32,9 @@ const Blog = ({ blog, handleLikes, handleDelete, user }) => {
     return (
       <div id='viewDetails'>
         {blog.url}<br/>
-        likes: {blog.likes} {'   '} <button className='handleLikes' onClick={updateLikeCount}>Like</button><br/>
+        <span>likes: {blog.likes}</span> {'   '} <button className='handleLikes' onClick={updateLikeCount}>Like</button><br/>
         {blog.user.name}
-        <br/>{ blog.user.username === user.username ? <button onClick={deleteBlog}>remove</button> : ''}
+        <br/>{ blog.user.username === user.username ? <button className='removeButton' onClick={deleteBlog}>remove</button> : ''}
       </div>
     )
   }
