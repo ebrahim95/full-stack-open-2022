@@ -19,7 +19,7 @@ const Anecdotes = ({anecdote, handleVote}) => {
 }
 
 const AnecdoteList = () => {
-    const anecdotes = useSelector(state => state.anecdotes)
+    const anecdotes = useSelector(({ anecdotes, filter }) => anecdotes.filter(anecdote => anecdote.content.includes(filter)))
     const sort_anecdotes = [...anecdotes]
     const dispatch = useDispatch()
     const voteOf = (id, message) => {
