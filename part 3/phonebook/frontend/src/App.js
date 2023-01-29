@@ -61,6 +61,7 @@ const App = () => {
       .then(returnedPerson => {
         setPersons([...persons, returnedPerson])
         handleNotification(`Added ${newPerson.name}`)
+        return 
       })
       .catch(error => {
         handleNotification(error.response.data.error)
