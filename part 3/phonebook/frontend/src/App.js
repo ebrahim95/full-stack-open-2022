@@ -61,11 +61,11 @@ const App = () => {
       .then(returnedPerson => {
         setPersons([...persons, returnedPerson])
         handleNotification(`Added ${newPerson.name}`)
-        return 
       })
       .catch(error => {
         handleNotification(error.response.data.error)
       })
+      return
     } 
     
     if (window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one`))
