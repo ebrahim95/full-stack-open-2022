@@ -1,6 +1,11 @@
 import { useState } from "react";
+import { likeBlog, removeBlog } from "../reducers/blogReducer";
+import { changeNotification } from "../reducers/notificationReducer";
+import { useDispatch, useSelector } from "react-redux";
 
-const Blog = ({ blog, handleLikes, handleDelete, user }) => {
+const Blog = ({ blog }) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const blogStyle = {
     paddingTop: 10,
     paddingBottom: 10,
@@ -18,30 +23,43 @@ const Blog = ({ blog, handleLikes, handleDelete, user }) => {
     user: blog.user.id,
     id: blog.id,
   };
-  const updateLikeCount = () => {
-    handleLikes(blog.id, updateBlog);
-  };
 
-  const deleteBlog = () => {
-    handleDelete(blog.id);
-  };
   const handleView = () => {
     setVisible(!visible);
   };
+
+  const handleLikes = () => {
+    try {
+      dispatch(likeBlog(blog.id, updateBlog));
+      dispatch(changeNotification(`Successfully liked ${updateBlog.title}`));
+    } catch (error) {
+      dispatch(changeNotification(error.message));
+    }
+  };
+
+  const handleDelete = () => {
+    try {
+      dispatch(removeBlog(blog.id));
+      changeNotification("Successfully Deleted");
+    } catch (error) {
+      dispatch(changeNotification(error.message));
+    }
+  };
+
   const viewDetails = () => {
     return (
       <div id="viewDetails">
         {blog.url}
         <br />
         <span>likes: {blog.likes}</span> {"   "}{" "}
-        <button className="handleLikes" onClick={updateLikeCount}>
+        <button className="handleLikes" onClick={handleLikes}>
           Like
         </button>
         <br />
         {blog.user.name}
         <br />
         {blog.user.username === user.username ? (
-          <button className="removeButton" onClick={deleteBlog}>
+          <button className="removeButton" onClick={handleDelete}>
             remove
           </button>
         ) : (
