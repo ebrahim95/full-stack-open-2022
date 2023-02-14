@@ -15,6 +15,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { initialUserInfo } from "./reducers/userInfoReducer";
 import DisplayUser from "./components/DisplayUser";
 import BlogDetails from "./components/BlogDetails";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -57,10 +58,7 @@ const App = () => {
     }
   };
 
-  const logOut = () => {
-    window.localStorage.removeItem("loggedIn");
-    dispatch(storeUser(null));
-  };
+
 
   if (user === null) {
     return (
@@ -74,10 +72,8 @@ const App = () => {
   return (
     <Router>
       <div>
-        <h2>blogs</h2>
+        <Navbar />
         <Notification message={notification} />
-        <p>{`${user.name} is logged in `}</p>
-        <button onClick={logOut}>Logout</button>
         <Togglable buttonLabel="Create New" ref={blogFormRef}>
           <BlogForm handleForm={handleAddBlog} />
         </Togglable>

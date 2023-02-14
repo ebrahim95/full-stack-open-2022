@@ -10,7 +10,10 @@ const BlogDetails = () => {
   const blog = useSelector((state) =>
     state.blogs.find((blog) => blog.id === id)
   );
-  console.log(blog);
+
+  if (!blog) {
+    return null
+  }
   const updateBlog = {
     title: blog.title,
     author: blog.author,
