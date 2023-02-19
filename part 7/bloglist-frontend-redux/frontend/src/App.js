@@ -8,14 +8,14 @@ import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Users from "./components/Users";
 import { useDispatch, useSelector } from "react-redux";
-import { changeNotification } from "./reducers/notificationReducer";
-import { addBlog, initialBlogs } from "./reducers/blogReducer";
+import { initialBlogs } from "./reducers/blogReducer";
 import { storeUser } from "./reducers/userReducer";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { initialUserInfo } from "./reducers/userInfoReducer";
 import DisplayUser from "./components/DisplayUser";
 import BlogDetails from "./components/BlogDetails";
 import Navbar from "./components/Navbar";
+import blogService from "./services/blogs";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -28,37 +28,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const loggedIn = window.localStorage.getItem("loggedIn");
+    const loggedIn = JSON.parse(window.localStorage.getItem("loggedIn"));
     if (loggedIn) {
-      dispatch(storeUser(JSON.parse(loggedIn)));
+      dispatch(storeUser(loggedIn));
+      blogService.setToken(loggedIn.token);
     }
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      dispatch(changeNotification(null));
-    }, 5000);
-  }, [notification]);
-
-  const handleNotification = (message) => {
-    dispatch(changeNotification(message));
-  };
-
   const blogFormRef = useRef();
-
-  const handleAddBlog = (blogObject) => {
-    try {
-      dispatch(addBlog(blogObject));
-      blogFormRef.current.toggleVisibility();
-      handleNotification(
-        `Successfully a new Blog ${blogObject.title} by ${blogObject.author}`
-      );
-    } catch (error) {
-      handleNotification("Wrong Object");
-    }
-  };
-
-
 
   if (user === null) {
     return (
@@ -75,7 +52,7 @@ const App = () => {
         <Navbar />
         <Notification message={notification} />
         <Togglable buttonLabel="Create New" ref={blogFormRef}>
-          <BlogForm handleForm={handleAddBlog} />
+          <BlogForm toggleRef={blogFormRef} />
         </Togglable>
 
         <Routes>

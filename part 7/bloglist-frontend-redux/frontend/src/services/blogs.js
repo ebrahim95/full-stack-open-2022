@@ -8,8 +8,8 @@ const setToken = (newtoken) => {
 };
 
 const getAll = async () => {
-  const request = axios.get(baseUrl);
-  return request.then((response) => response.data);
+  const response = await axios.get(baseUrl);
+  return response.data;
 };
 
 const create = async (newObject) => {
@@ -25,6 +25,11 @@ const update = async (id, editedObject) => {
   return response.data;
 };
 
+const addComment = async (id, comment) => {
+  const response = await axios.post(`${baseUrl}/${id}/comments`, { comment });
+  return response.data;
+};
+
 const remove = async (id) => {
   const config = {
     headers: { Authorization: token },
@@ -34,4 +39,4 @@ const remove = async (id) => {
   return response.data;
 };
 
-export default { getAll, setToken, create, update, remove };
+export default { getAll, setToken, create, update, remove, addComment };

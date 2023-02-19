@@ -1,51 +1,43 @@
 import { useState } from "react";
-const BlogForm = ({ handleForm }) => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+import { changeNotification } from "../reducers/notificationReducer";
+import { addBlog } from "../reducers/blogReducer";
+import { useDispatch } from "react-redux";
+import { useField } from "../hooks";
+const BlogForm = ({ toggleRef }) => {
+  const { clearValue: resetTitle, ...title } = useField("text");
+  const { clearValue: resetAuthor, ...author } = useField("text");
+  const { clearValue: resetUrl, ...url } = useField("text");
+  const dispatch = useDispatch();
+
+  const handleAddBlog = async (blogObject) => {
+    try {
+      dispatch(addBlog(blogObject));
+      toggleRef.current.toggleVisibility();
+    } catch (error) {
+      dispatch(changeNotification("Wrong Object"));
+    }
+  };
 
   const blogToBe = (event) => {
     event.preventDefault();
-    handleForm({
-      title: title,
-      author: author,
-      url: url,
+    handleAddBlog({
+      title: title.value,
+      author: author.value,
+      url: url.value,
     });
-
-    setTitle("");
-    setAuthor("");
-    setUrl("");
   };
 
   return (
     <div>
       <form onSubmit={blogToBe}>
-        title{"    "}
-        <input
-          className="title"
-          type="text"
-          value={title}
-          name="title"
-          onChange={(event) => setTitle(event.target.value)}
-        />
+        title:{"    "}
+        <input {...title} />
         <br />
-        author{"    "}
-        <input
-          className="author"
-          type="text"
-          value={author}
-          name="author"
-          onChange={(event) => setAuthor(event.target.value)}
-        />
+        author:{"    "}
+        <input {...author} />
         <br />
-        url{"    "}
-        <input
-          className="url"
-          type="text"
-          value={url}
-          name="url"
-          onChange={(event) => setUrl(event.target.value)}
-        />
+        url:{"    "}
+        <input {...url} />
         <br />
         <br />
         <button id="blogSubmit" type="submit">

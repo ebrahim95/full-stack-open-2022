@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
+import { changeNotification } from "./notificationReducer";
+import { initialUserInfo } from "./userInfoReducer";
 
 const blogSlice = createSlice({
   name: "blogs",
@@ -46,6 +48,7 @@ export const likeBlog = (id, blogObject) => {
   return async (dispatch) => {
     const updateBlog = await blogService.update(id, blogObject);
     dispatch(updateLikes(updateBlog));
+    dispatch(changeNotification(`Successfully liked ${updateBlog.title}`));
   };
 };
 
@@ -53,6 +56,13 @@ export const addBlog = (blogObject) => {
   return async (dispatch) => {
     const returnBlog = await blogService.create(blogObject);
     dispatch(createBlog(returnBlog));
+    dispatch(
+      changeNotification(
+        `Successfully a new Blog ${blogObject.title} by ${blogObject.author}`
+      )
+    );
+    dispatch(initialBlogs());
+    dispatch(initialUserInfo());
   };
 };
 
@@ -60,5 +70,6 @@ export const removeBlog = (id) => {
   return async (dispatch) => {
     await blogService.remove(id);
     dispatch(deleteBlog(id));
+    dispatch(changeNotification("Successfully Deleted"));
   };
 };
