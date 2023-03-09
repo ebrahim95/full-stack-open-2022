@@ -1,18 +1,18 @@
-{
-  "extends": [
+module.exports = {
+  extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
-  "plugins": [
+  plugins: [
     "@typescript-eslint"
   ],
-  "env": {
-    "browser": true,
-    "es6": true,
-    "node": true
+  env: {
+    browser: true,
+    es6: true,
+    node: true
   },
-  "rules": {
+  rules: {
     "@typescript-eslint/semi": [
       "error"
     ],
@@ -29,8 +29,10 @@
     ],
     "no-case-declarations": "off"
   },
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.json"
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "tsconfig.json",
+    tsconfigRootDir: __dirname,
+    sourceType: "module"
   }
-}
+}      
