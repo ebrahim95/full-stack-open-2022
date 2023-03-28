@@ -17,11 +17,12 @@ const App = () => {
     void getDiaries().then(data => setDiaries(data));
   }, []);
 
-  const addDiary = async (event: SyntheticEvent) => {
-    event.preventDefault();
-    try {
-      const response = await addDiaryEntry(addEntry);
-      setDiaries([...diaries, response as DiaryEntry]);
+  const onSubmit = () => {
+    const addTheEntry = async () => {
+      try {
+        const response = await addDiaryEntry(addEntry);
+        setDiaries([...diaries, response as DiaryEntry]);
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data && typeof error.response?.data === 'string') {
@@ -31,7 +32,14 @@ const App = () => {
         console.error(error);
       }
 
-    }
+  }  
+  };
+  void addTheEntry();
+  };
+  
+  const addDiary =  (event: SyntheticEvent) => {
+    event.preventDefault();
+    onSubmit();
   };
 
   const handleAddEntry = (event: ChangeEvent<HTMLInputElement>) => {
