@@ -1,7 +1,7 @@
 import express from 'express';
 import patientsService from '../services/patientsService';
 import checkNewPatientEntry from '../utils/utils';
-
+import { checkNewEntries } from '../utils/utils';
 const router = express.Router();
 
 router.get('/', (_req, res) => {
@@ -9,9 +9,15 @@ router.get('/', (_req, res) => {
 });
 
 router.post('/', (req, res) => {
-  console.log(req.body);
   const newPatient = checkNewPatientEntry(req.body);
   const addEntry = patientsService.addPatient(newPatient);
+  res.json(addEntry);
+});
+
+
+router.post('/:id/entries', (req, res) => {
+  const newEntry = checkNewEntries(req.body);
+  const addEntry = patientsService.addEntries(newEntry, req.params.id);
   res.json(addEntry);
 });
 

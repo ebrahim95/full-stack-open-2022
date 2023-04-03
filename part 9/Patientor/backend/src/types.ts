@@ -11,7 +11,6 @@ export enum HealthCheckRating {
   "CriticalRisk" = 3,
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface BaseEntry {
   id: string;
   description: string;
@@ -34,12 +33,15 @@ export interface OccupationalHealthcareEntry extends BaseEntry {
   sickLeave?: SickLeave;
 }
 
+export interface Discharge {
+  date: string;
+  criteria: string;
+
+
+}
 export interface Hospital extends BaseEntry {
   type: "Hospital";
-  discharge: {
-    date: string;
-    criteria: string;
-  }
+  discharge: Discharge
 }
 export type Entry = HealthCheckEntry | OccupationalHealthcareEntry | Hospital;
 
@@ -58,6 +60,12 @@ export interface Patient {
   entries: Entry[]
 
 }
+
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
+
+export type EntryWithoutId = UnionOmit<Entry, 'id'>;
+
+
 
 export type newPatientNoID = Omit<Patient, 'id'>;
 export type noSSN = Omit<Patient, 'ssn' | 'entries'>;

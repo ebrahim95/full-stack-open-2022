@@ -1,4 +1,4 @@
-import { noSSN, newPatientNoID, Patient } from "../types";
+import { noSSN, newPatientNoID, Patient, EntryWithoutId, Entry } from "../types";
 import patients from "../data/patients";
 import { v4 as uuid } from 'uuid';
 
@@ -30,8 +30,25 @@ const addPatient = (newPatientEntry: newPatientNoID): Patient => {
   return enterPatient;
 };
 
+const addEntries = (newEntry: EntryWithoutId, id: string): Entry => {
+  const entry_id = uuid();
+  const enterEntry = {
+    id: entry_id,
+    ...newEntry
+  };
+
+  patients.map(patient => {
+    if (patient.id === id) {
+      patient.entries.push(enterEntry);
+    }
+  });
+
+  return enterEntry;
+
+};
 export default {
   getPatientsData,
   addPatient,
-  getPatientsDataId
+  getPatientsDataId,
+  addEntries
 };
