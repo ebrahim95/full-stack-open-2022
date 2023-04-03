@@ -15,15 +15,17 @@ const Part = ({ part }: { part: CoursePart }) => {
           <i>{part.description}</i>
         </div>)
     case "group":
-      return (<div>
-        project exercises {part.groupProjectCount}
-      </div>
+      return (
+        <div>
+          project exercises {part.groupProjectCount}
+        </div>
       )
     case "background":
-      return (<div>
-        <i>{part.description}</i>
-        <br />{part.backgroundMaterial}
-      </div>)
+      return (
+        <div>
+          <i>{part.description}</i>
+          <br />{part.backgroundMaterial}
+        </div>)
     case "special":
       return (
         <div>
