@@ -10,9 +10,10 @@ const Part = ({ part }: { part: CoursePart }) => {
 
   switch (part.kind) {
     case "basic":
-      return (<div>
-        <i>{part.description}</i>
-      </div>)
+      return (
+        <div>
+          <i>{part.description}</i>
+        </div>)
     case "group":
       return (<div>
         project exercises {part.groupProjectCount}
