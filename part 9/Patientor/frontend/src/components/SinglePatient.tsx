@@ -1,10 +1,11 @@
 import { useParams } from "react-router-dom"
-import { Diagnosis, Patient, Entry, OccupationalHealthcareEntry, HospitalEntry, HealthCheckEntry, EntryWithoutId } from "../types"
+import { Diagnosis, Patient, Entry, OccupationalHealthcareEntry, HospitalEntry, HealthCheckEntry, EntryWithoutId, SickLeave, Discharge } from "../types"
 import { useState, useEffect, ChangeEvent, SyntheticEvent } from "react"
 import PatientService from "../services/patients"
 import DiagnosisService from "../services/diagnosis"
-import { Button, FormControl, Input, MenuItem, Select, SelectChangeEvent, InputLabel, TextField, RadioGroup, FormControlLabel, Radio } from '@mui/material'
+import { Button, Box, CardContent, Card, FormControl, MenuItem, Select, SelectChangeEvent, TextField, RadioGroup, FormControlLabel, Radio, Typography, Alert, AlertTitle } from '@mui/material'
 import axios from "axios"
+import SendIcon from '@mui/icons-material/Send';
 
 const assertNever = (value: never): never => {
   throw new Error(
@@ -16,24 +17,33 @@ interface Occupation {
   entries: OccupationalHealthcareEntry
 }
 
-interface HealthCheck {
+interface Health {
   entries: HealthCheckEntry
 }
 
-interface Hospital {
+interface HospitalCheck {
   entries: HospitalEntry
 }
-const Hospital = (props: Hospital) => {
+
+const Hospital = (props: HospitalCheck) => {
 
   const { entries } = props
   return (
-    <div>
-      <div key={entries.date}>
-        {entries.date}
-        <br />{entries.description}
-        <p>Diagnosed by {entries.specialist}</p>
-      </div>
-    </div>
+    <Card sx={{ mb: 4, maxWidth: 500 }}>
+      <CardContent>
+        <Typography variant="h6">{entries.date}</Typography>
+        <br />
+        <Typography variant="body1"> {entries.description}</Typography>
+        <Typography variant="body1">
+          <p>
+            Discharge  <br />
+            {`Date: ${entries.discharge?.date}`}<br />
+            {`Criteria: ${entries.discharge?.criteria}`}
+          </p>
+        </Typography>
+        <Typography variant="body2">Diagnosed by {entries.specialist}</ Typography>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -42,25 +52,40 @@ const Occupational = (props: Occupation) => {
   const { entries } = props
 
   return (
-    <div>
-      <div key={entries.date}>
-        {entries.date}
-        <br />{entries.description}
-        <p>Diagnosed by {entries.specialist}</p>
-      </div>
-    </div>)
+    <Card sx={{ mb: 4, maxWidth: 500 }}>
+      <CardContent>
+        <Typography variant="h6">{entries.date}</Typography>
+        <br />
+        <Typography variant="body1"> {entries.description}</Typography>
+        <br />
+        <Typography variant="body1"> Employed By: {entries.employerName}</Typography>
+        <Typography variant="body1">
+          <p>
+            Sick Leave <br />
+            {`Start Date: ${entries.sickLeave?.startDate}`}<br />
+            {`End Date: ${entries.sickLeave?.endDate}`}
+          </p>
+        </Typography>
+        <br />
+        <Typography variant="body2">Diagnosed by {entries.specialist}</ Typography>
+      </CardContent>
+    </Card >
+  )
 }
 
-const HealthCheck = (props: HealthCheck) => {
+const HealthCheck = (props: Health) => {
   const { entries } = props
   return (
-    <div>
-      <div key={entries.date}>
-        {entries.date}
-        <br />{entries.description}
-        <p>Diagnosed by {entries.specialist}</p>
-      </div>
-    </div>
+    <Card sx={{ mb: 4, maxWidth: 500 }}>
+      <CardContent>
+        <Typography variant="h6">{entries.date}</Typography>
+        <br />
+        <Typography variant="body1"> {entries.description}</Typography>
+        <br />
+        <Typography variant="body2">Diagnosed by {entries.specialist}</ Typography>
+      </CardContent>
+    </Card>
+
   )
 }
 
@@ -99,6 +124,15 @@ const SinglePatient = () => {
 
   const [formType, setType] = useState<string>("")
   const [formDiagnosis, setFormDiagnosis] = useState<string[]>([])
+  const [discharge, setDischarge] = useState<Discharge>({
+    date: "",
+    criteria: ""
+  })
+  const [sickLeave, setSickleave] = useState<SickLeave>({
+    startDate: "",
+    endDate: ""
+  })
+  const [notification, setNotification] = useState<String>("")
 
   const { id } = useParams()
   useEffect(() => {
@@ -113,7 +147,7 @@ const SinglePatient = () => {
     }
 
     void fetchPatient();
-  }, [])
+  }, [id])
   const hideOrShow = () => {
     setVisible(!visible);
   }
@@ -121,11 +155,19 @@ const SinglePatient = () => {
   const onSubmit = (id: string) => {
     const addTheEntry = async () => {
       try {
-        const response = await PatientService.create_entry(id, addEntry);
+        const entry = await PatientService.create_entry(id, addEntry);
+        console.log(entry)
+        if (singlePatient && 'id' in singlePatient && singlePatient.entries) {
+          setSinglePatient({ ...singlePatient, entries: [...singlePatient.entries, entry] })
+        }
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response?.data && typeof error.response?.data === 'string') {
             console.log(error.response?.data);
+            setNotification(error.response?.data)
+
+            setTimeout(() => setNotification(""), 5000)
+
           } else {
             console.error(error)
           }
@@ -150,6 +192,40 @@ const SinglePatient = () => {
       [event.target.name]: value
     });
   }
+  const handleDischarge = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target?.value
+
+    setDischarge({
+      ...discharge,
+      [event.target.name]: value
+    })
+
+    if (addEntry.type === 'Hospital') {
+      setEntry({
+        ...addEntry,
+        discharge: discharge
+      })
+
+    }
+  }
+
+  const handleSickLeave = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target?.value
+
+    setSickleave({
+      ...sickLeave,
+      [event.target.name]: value
+    })
+
+    if (addEntry.type === "OccupationalHealthcare") {
+      setEntry({
+        ...addEntry,
+        sickLeave: sickLeave
+      })
+    }
+  }
+
+
 
   const handleRadio = (event: ChangeEvent<HTMLInputElement>) => {
 
@@ -166,18 +242,58 @@ const SinglePatient = () => {
     if (Array.isArray(value)) {
       setFormDiagnosis(value)
     }
+
+    setEntry({
+      ...addEntry,
+      diagnosisCodes: formDiagnosis
+    })
   }
+
+  // TODO: might add a reset 
+  let render_textfields;
+  if (formType === 'Hospital') {
+    render_textfields =
+      <>
+        <TextField onChange={handleDischarge} placeholder="Date" name="date" type="date" />
+        <TextField onChange={handleDischarge} placeholder="Criteria" name="criteria" type="text" />
+      </>
+  } else if (formType === 'OccupationalHealthcare') {
+    render_textfields =
+      <>
+
+        <TextField onChange={handleInput} placeholder="Employer Name" name="employerName" type="text" />
+        <TextField onChange={handleSickLeave} placeholder="Start Date" name="startDate" type="date" />
+        <TextField onChange={handleSickLeave} placeholder="End Date" name="endDate" type="date" />
+      </>
+
+  } else {
+    render_textfields =
+      <>
+        <TextField onChange={handleInput} placeholder="Health Check Rating" name="healthCheckRating" type="number" />
+      </>
+  }
+
 
   return (
     <div>
-      <h2> {singlePatient?.name} </h2>
-      <p> ssh: {singlePatient?.ssn} <br />
-        occupation: {singlePatient?.occupation}
-      </p>
-      <h3> New Entries </h3>
 
+      {notification !== "" ?
+        <Alert sx={{ my: 6 }} severity="error">
+          <AlertTitle>Error</AlertTitle>
+          {notification}
+        </Alert> : null}
+
+      <Typography sx={{ mt: 2 }} variant="h4"> {singlePatient?.name} </Typography>
+
+      <Typography variant="subtitle1">
+        <p> ssh: {singlePatient?.ssn} <br />
+          occupation: {singlePatient?.occupation}
+        </p>
+      </Typography>
+
+      <Typography variant="h5"> New Entries </Typography>
       {visible ?
-        <FormControl sx={{ m: 2 }} onSubmit={submitEntry}>
+        <FormControl sx={{ m: 2 }} >
           <TextField onChange={handleInput} placeholder="Description" name="description" type='text' />
 
           <TextField onChange={handleInput} name="date" type="date" />
@@ -210,14 +326,16 @@ const SinglePatient = () => {
               control={<Radio size="small" />}
               label="Hospital" />
           </RadioGroup>
-
-
-          <TextField onChange={handleInput} placeholder="Health Check Rating" name="healthCheckRating" type="number" />
-          <Button type="submit"> Submit </Button>
+          {render_textfields}
+          <Box textAlign='center'>
+            <Button sx={{ my: 4, minHeight: 50 }} onClick={submitEntry} variant="contained" endIcon={<SendIcon />} type="submit"> Submit </Button>
+          </Box>
         </FormControl> : null}
       <br />
-      <Button variant="contained" onClick={hideOrShow} >{visible ? "Hide" : "Add a new Entry"} </Button>
-      <h3> entries </h3>
+      <Button variant="outlined" onClick={hideOrShow} >{visible ? "Hide" : "Add a new Entry"} </Button>
+
+      <Typography variant="h5" sx={{ my: 2 }}>  Entries </Typography>
+
       <div>
         {singlePatient?.entries !== undefined ? singlePatient?.entries.map(obj => {
           return <EntryDetails key={obj.id} entries={obj} />

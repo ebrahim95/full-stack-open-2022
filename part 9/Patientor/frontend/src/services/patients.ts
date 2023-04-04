@@ -26,7 +26,7 @@ const getSingle = async (id: string) => {
 }
 
 const create_entry = async (id: string, obj: EntryWithoutId) => {
-  const { data } = await axios.post(`${apiBaseUrl}/patients/${id}/entries`, obj)
+  const { data } = await axios.post<Entry>(`${apiBaseUrl}/patients/${id}/entries`, obj)
   return data;
 }
 

@@ -150,17 +150,24 @@ const parseDiagnosisCodes = (object: unknown): Array<Diagnosis['code']> => {
 };
 
 const parseSickLeave = (object: unknown): SickLeave => {
-  if (!object || typeof object !== 'object' || Object.keys(object).length === 0
-    || !('startDate' in object) || !parseString(object.startDate, 'startDate') ||
-    !('endDate' in object) || !parseString(object.endDate, 'endDate')
+  if (object && typeof object === 'object' &&
+    'sickLeave' in object &&
+    object.sickLeave &&
+    typeof object.sickLeave === 'object' &&
+    "startDate" in object.sickLeave &&
+    "endDate" in object.sickLeave
   ) {
     return {
-      startDate: "",
-      endDate: ""
+      startDate: parseDate(object.sickLeave.startDate),
+      endDate: parseDate(object.sickLeave.endDate)
     };
+
   }
 
-  return object as SickLeave;
+  return {
+    startDate: "",
+    endDate: "",
+  };
 
 };
 
@@ -173,7 +180,7 @@ const parseDischarge = (object: unknown): Discharge => {
     "criteria" in object.discharge
   ) {
     return {
-      date: parseString(object.discharge.date, "date"),
+      date: parseDate(object.discharge.date),
       criteria: parseString(object.discharge.criteria, "criteria")
     };
   }
@@ -217,9 +224,9 @@ export const checkNewEntries = (object: unknown): EntryWithoutId => {
         employerName: parseString(object.employerName, "employerName")
       };
 
-      if ("sickLeave" in object && !object.sickLeave) {
+      if ("sickLeave" in object && object.sickLeave) {
         newEntry = {
-          ...newEntry, sickLeave: parseSickLeave(object.sickLeave)
+          ...newEntry, sickLeave: parseSickLeave(object)
         };
       }
       return newEntry;
