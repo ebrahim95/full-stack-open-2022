@@ -34,13 +34,13 @@ const Hospital = (props: HospitalCheck) => {
         <Typography variant="h6">{entries.date}</Typography>
         <br />
         <Typography variant="body1"> {entries.description}</Typography>
+        <br />
+        <Typography variant="h6"> Discharge </Typography>
         <Typography variant="body1">
-          <p>
-            Discharge  <br />
-            {`Date: ${entries.discharge?.date}`}<br />
-            {`Criteria: ${entries.discharge?.criteria}`}
-          </p>
+          {`Date: ${entries.discharge?.date}`}<br />
+          {`Criteria: ${entries.discharge?.criteria}`}
         </Typography>
+        <br />
         <Typography variant="body2">Diagnosed by {entries.specialist}</ Typography>
       </CardContent>
     </Card>
@@ -55,16 +55,15 @@ const Occupational = (props: Occupation) => {
     <Card sx={{ mb: 4, maxWidth: 500 }}>
       <CardContent>
         <Typography variant="h6">{entries.date}</Typography>
+        <Typography variant="body1"> Employed By: {entries.employerName}</Typography>
         <br />
         <Typography variant="body1"> {entries.description}</Typography>
         <br />
-        <Typography variant="body1"> Employed By: {entries.employerName}</Typography>
+
+        <Typography variant="h6"> Sick Leave</Typography>
         <Typography variant="body1">
-          <p>
-            Sick Leave <br />
-            {`Start Date: ${entries.sickLeave?.startDate}`}<br />
-            {`End Date: ${entries.sickLeave?.endDate}`}
-          </p>
+          {`Start Date: ${entries.sickLeave?.startDate}`}<br />
+          {`End Date: ${entries.sickLeave?.endDate}`}
         </Typography>
         <br />
         <Typography variant="body2">Diagnosed by {entries.specialist}</ Typography>
