@@ -93,7 +93,6 @@ const checkNewPatientEntry = (object: unknown): newPatientNoID => {
   if (!object || typeof object !== 'object') {
     throw new Error('incorrect or missing data');
   }
-
   if ('name' in object && 'dateOfBirth' in object && 'ssn' in object && 'gender' in object && 'occupation' in object && 'entries' in object) {
     const newEntry: newPatientNoID = {
       name: parseName(object.name),
@@ -200,7 +199,6 @@ export const checkNewEntries = (object: unknown): EntryWithoutId => {
   if ('type' in object && 'description' in object && 'date' in object && 'specialist' in object) {
 
     if (object.type === "HealthCheck" && "healthCheckRating" in object) {
-      console.log(object);
       let newEntry: EntryWithoutId = {
         description: parseString(object.description, "description"),
         date: parseDate(object.date),

@@ -156,7 +156,7 @@ const SinglePatient = () => {
     const addTheEntry = async () => {
       try {
         const entry = await PatientService.create_entry(id, addEntry);
-        console.log(entry)
+
         if (singlePatient && 'id' in singlePatient && singlePatient.entries) {
           setSinglePatient({ ...singlePatient, entries: [...singlePatient.entries, entry] })
         }

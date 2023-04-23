@@ -9,6 +9,7 @@ router.get('/', (_req, res) => {
 });
 
 router.post('/', (req, res) => {
+  req.body.entries = [];
   const newPatient = checkNewPatientEntry(req.body);
   const addEntry = patientsService.addPatient(newPatient);
   res.json(addEntry);
